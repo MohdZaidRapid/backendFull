@@ -16,7 +16,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
+      lowecase: true,
       trim: true,
     },
     fullName: {
@@ -30,7 +30,7 @@ const userSchema = new Schema(
       required: true,
     },
     coverImage: {
-      type: String, //cloudinary
+      type: String, // cloudinary url
     },
     watchHistory: [
       {
@@ -53,8 +53,8 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
 
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
@@ -76,8 +76,7 @@ userSchema.methods.generateAccessToken = function () {
     }
   );
 };
-
-userSchema.methods.generateRefreshToken = function (password) {
+userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
       _id: this._id,
