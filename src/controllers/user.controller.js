@@ -169,8 +169,9 @@ const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1,
+        // this removes field from document
       },
     },
     {
@@ -255,7 +256,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(200, req.user, "current user fetched successfully");
+    .json(new ApiResponse(200, req.user, "current user fetched successfully"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -294,7 +295,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findByIdAndUpdate(
-    req.user_.id,
+    req.user._id,
     {
       $set: { avatar: avatar.url },
     },
@@ -314,12 +315,12 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-  if (!coverImageLocalPath.url) {
+  if (!coverImage.url) {
     throw new ApiError(400, "Error while uploading on CoverImage");
   }
 
   const user = await User.findByIdAndUpdate(
-    req.user_.id,
+    req.user._id,
     {
       $set: { coverImage: coverImage.url },
     },
@@ -450,8 +451,11 @@ const getWatchHistory = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, user[0].watchHistory),
-      "Watch history fetched successfully"
+      new ApiResponse(
+        200,
+        user[0].watchHistory,
+        "Watch history fetched successfully"
+      )
     );
 });
 
